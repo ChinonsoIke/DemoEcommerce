@@ -1,0 +1,242 @@
+[
+  {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "name": "Electronics",
+    "products": [
+      {
+        "id": "11111111-aaaa-1111-aaaa-111111111111",
+        "name": "Wireless Headphones",
+        "description": "Noise-cancelling over-ear headphones with Bluetooth.",
+        "categoryId": "11111111-1111-1111-1111-111111111111",
+        "reviews": [
+          {
+            "id": "11111111-bbbb-1111-bbbb-111111111111",
+            "rating": 5,
+            "description": "Excellent sound quality"
+          },
+          {
+            "id": "11111111-cccc-1111-cccc-111111111111",
+            "rating": 4,
+            "description": "Very comfortable but pricey"
+          }
+        ]
+      },
+      {
+        "id": "11111111-aaaa-2222-aaaa-222222222222",
+        "name": "Smartphone",
+        "description": "6.5-inch OLED display, 128GB storage.",
+        "categoryId": "11111111-1111-1111-1111-111111111111",
+        "reviews": [
+          {
+            "id": "11111111-bbbb-2222-bbbb-222222222222",
+            "rating": 4,
+            "description": "Fast and reliable"
+          }
+        ]
+      },
+      {
+        "id": "11111111-aaaa-3333-aaaa-333333333333",
+        "name": "Gaming Console",
+        "description": "Next-gen console with 4K support.",
+        "categoryId": "11111111-1111-1111-1111-111111111111",
+        "reviews": []
+      },
+      {
+        "id": "11111111-aaaa-4444-aaaa-444444444444",
+        "name": "Bluetooth Speaker",
+        "description": "Portable waterproof speaker with deep bass.",
+        "categoryId": "11111111-1111-1111-1111-111111111111",
+        "reviews": []
+      }
+    ]
+  },
+  {
+    "id": "22222222-2222-2222-2222-222222222222",
+    "name": "Books",
+    "products": [
+      {
+        "id": "22222222-aaaa-1111-aaaa-111111111111",
+        "name": "C# in Depth",
+        "description": "Comprehensive guide to advanced C# concepts.",
+        "categoryId": "22222222-2222-2222-2222-222222222222",
+        "reviews": [
+          {
+            "id": "22222222-bbbb-1111-bbbb-111111111111",
+            "rating": 5,
+            "description": "Perfect for advanced developers"
+          }
+        ]
+      },
+      {
+        "id": "22222222-aaaa-2222-aaaa-222222222222",
+        "name": "Clean Code",
+        "description": "Handbook of Agile Software Craftsmanship.",
+        "categoryId": "22222222-2222-2222-2222-222222222222",
+        "reviews": [
+          {
+            "id": "22222222-bbbb-2222-bbbb-222222222222",
+            "rating": 5,
+            "description": "Must-read for every developer"
+          },
+          {
+            "id": "22222222-bbbb-3333-bbbb-333333333333",
+            "rating": 4,
+            "description": "Very practical examples"
+          }
+        ]
+      },
+      {
+        "id": "22222222-aaaa-3333-aaaa-333333333333",
+        "name": "Domain-Driven Design",
+        "description": "Tackling complexity in software projects.",
+        "categoryId": "22222222-2222-2222-2222-222222222222",
+        "reviews": []
+      },
+      {
+        "id": "22222222-aaaa-4444-aaaa-444444444444",
+        "name": "The Pragmatic Programmer",
+        "description": "Classic guide to software craftsmanship.",
+        "categoryId": "22222222-2222-2222-2222-222222222222",
+        "reviews": []
+      }
+    ]
+  },
+  {
+    "id": "33333333-3333-3333-3333-333333333333",
+    "name": "Clothing",
+    "products": [
+      {
+        "id": "33333333-aaaa-1111-aaaa-111111111111",
+        "name": "Men's T-Shirt",
+        "description": "100% cotton slim-fit t-shirt.",
+        "categoryId": "33333333-3333-3333-3333-333333333333",
+        "reviews": [
+          {
+            "id": "33333333-bbbb-1111-bbbb-111111111111",
+            "rating": 4,
+            "description": "Comfortable and soft"
+          }
+        ]
+      },
+      {
+        "id": "33333333-aaaa-2222-aaaa-222222222222",
+        "name": "Women's Jeans",
+        "description": "High-waisted stretch jeans.",
+        "categoryId": "33333333-3333-3333-3333-333333333333",
+        "reviews": []
+      },
+      {
+        "id": "33333333-aaaa-3333-aaaa-333333333333",
+        "name": "Winter Jacket",
+        "description": "Warm, water-resistant winter jacket.",
+        "categoryId": "33333333-3333-3333-3333-333333333333",
+        "reviews": []
+      },
+      {
+        "id": "33333333-aaaa-4444-aaaa-444444444444",
+        "name": "Running Shoes",
+        "description": "Lightweight running shoes with cushioning.",
+        "categoryId": "33333333-3333-3333-3333-333333333333",
+        "reviews": [
+          {
+            "id": "33333333-bbbb-2222-bbbb-222222222222",
+            "rating": 5,
+            "description": "Perfect for long runs"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "44444444-4444-4444-4444-444444444444",
+    "name": "Home & Kitchen",
+    "products": [
+      {
+        "id": "44444444-aaaa-1111-aaaa-111111111111",
+        "name": "Coffee Maker",
+        "description": "12-cup programmable coffee maker.",
+        "categoryId": "44444444-4444-4444-4444-444444444444",
+        "reviews": [
+          {
+            "id": "44444444-bbbb-1111-bbbb-111111111111",
+            "rating": 5,
+            "description": "Great coffee every morning"
+          }
+        ]
+      },
+      {
+        "id": "44444444-aaaa-2222-aaaa-222222222222",
+        "name": "Blender",
+        "description": "High-speed blender for smoothies.",
+        "categoryId": "44444444-4444-4444-4444-444444444444",
+        "reviews": []
+      },
+      {
+        "id": "44444444-aaaa-3333-aaaa-333333333333",
+        "name": "Air Fryer",
+        "description": "Oil-less air fryer with digital timer.",
+        "categoryId": "44444444-4444-4444-4444-444444444444",
+        "reviews": []
+      },
+      {
+        "id": "44444444-aaaa-4444-aaaa-444444444444",
+        "name": "Vacuum Cleaner",
+        "description": "Bagless upright vacuum cleaner.",
+        "categoryId": "44444444-4444-4444-4444-444444444444",
+        "reviews": [
+          {
+            "id": "44444444-bbbb-2222-bbbb-222222222222",
+            "rating": 3,
+            "description": "Good but a bit noisy"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "55555555-5555-5555-5555-555555555555",
+    "name": "Sports & Outdoors",
+    "products": [
+      {
+        "id": "55555555-aaaa-1111-aaaa-111111111111",
+        "name": "Yoga Mat",
+        "description": "Eco-friendly non-slip yoga mat.",
+        "categoryId": "55555555-5555-5555-5555-555555555555",
+        "reviews": []
+      },
+      {
+        "id": "55555555-aaaa-2222-aaaa-222222222222",
+        "name": "Camping Tent",
+        "description": "4-person waterproof camping tent.",
+        "categoryId": "55555555-5555-5555-5555-555555555555",
+        "reviews": [
+          {
+            "id": "55555555-bbbb-1111-bbbb-111111111111",
+            "rating": 5,
+            "description": "Perfect for weekend trips"
+          }
+        ]
+      },
+      {
+        "id": "55555555-aaaa-3333-aaaa-333333333333",
+        "name": "Mountain Bike",
+        "description": "21-speed mountain bike with suspension.",
+        "categoryId": "55555555-5555-5555-5555-555555555555",
+        "reviews": []
+      },
+      {
+        "id": "55555555-aaaa-4444-aaaa-444444444444",
+        "name": "Tennis Racket",
+        "description": "Lightweight racket with graphite frame.",
+        "categoryId": "55555555-5555-5555-5555-555555555555",
+        "reviews": [
+          {
+            "id": "55555555-bbbb-2222-bbbb-222222222222",
+            "rating": 4,
+            "description": "Great grip and balance"
+          }
+        ]
+      }
+    ]
+  }
+]
