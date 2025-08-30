@@ -9,6 +9,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DemoEcommerce.Application.Implementations
 {
@@ -57,7 +58,9 @@ namespace DemoEcommerce.Application.Implementations
         {
             var queryEmbedding = await _aIService.GetEmbedding(query);
             var results = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding, filter: p => p.Id == productId);
+            var generalResults = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding);
             var mapped = _mapper.Map<List<ProductResponse>>(results);
+            var generalMapped = _mapper.Map<List<ProductResponse>>(generalResults);
 
             foreach ( var result in mapped)
             {
@@ -69,7 +72,29 @@ namespace DemoEcommerce.Application.Implementations
                 result.ReviewSummary = (string)reviewSummary;
             }
 
-            var chat = _aIService.GetChatCompletion(query, JsonConvert.SerializeObject(mapped));
+            string systemPrompt = $"""
+                You are a chat assistant for an e-commerce app.
+                This is the product the user is inquiring about:
+                {JsonConvert.SerializeObject(mapped)}
+
+                If the question seems specific, then answer relating only to the product.
+
+                If the question is more generalized, then you can combine information from the other products listed here:
+                {JsonConvert.SerializeObject(generalMapped)}
+
+                Answer like an actual assistant trying to provide meaningful information.
+
+                Answer only questions related to the context of our e-commerce app.
+                If the question is not related prompt the user to
+                ask another question.
+                """;
+            var messages = new List<ChatMessage>
+            {
+                new ChatMessage(ChatRole.System, systemPrompt),
+                new ChatMessage(ChatRole.User, query)
+            };
+
+            var chat = _aIService.GetChatCompletion(messages);
             await foreach(string chunk in chat)
             {
                 yield return chunk;

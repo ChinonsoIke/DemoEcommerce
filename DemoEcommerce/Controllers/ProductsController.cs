@@ -22,7 +22,7 @@ namespace DemoEcommerce.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult> GetProduct(Guid id)
         {
             var response = await _productService.GetProduct(id);

@@ -25,6 +25,16 @@ builder.Services.AddSingleton(typeof(InMemoryVectorStores), new InMemoryVectorSt
 builder.Services.AddAutoMapper(options => options.AddProfile<MappingProfile>());
 builder.Services.AddMemoryCache();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins(builder.Configuration["FrontendUrl"])
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -44,6 +54,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 
