@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -20,6 +21,7 @@ namespace DemoEcommerce.Application.Implementations
         private readonly AppDbContext _dbContext;
         private readonly IMemoryCache _memoryCache;
         private readonly IMapper _mapper;
+        private readonly ChatOptions _chatOptions;
 
         public ProductService(IAIService aIService, InMemoryVectorStores inMemoryVectorStores, AppDbContext dbContext,IMemoryCache memoryCache, IMapper mapper)
         {
@@ -28,6 +30,10 @@ namespace DemoEcommerce.Application.Implementations
             _dbContext = dbContext;
             _memoryCache = memoryCache;
             _mapper = mapper;
+            _chatOptions = new ChatOptions
+            {
+                Tools = [AIFunctionFactory.Create(Search)]
+            };
         }
 
         public List<ProductResponse> GetProducts()
@@ -59,47 +65,63 @@ namespace DemoEcommerce.Application.Implementations
             Product product = _dbContext.Products.Include(p => p.Reviews).FirstOrDefault(p => p.Id == productId);
             if (product == null) yield break;
 
-            var mapped = _mapper.Map<ProductResponse>(product);
-
-            var queryEmbedding = await _aIService.GetEmbedding(query);
-            
-            var generalResults = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding);
-            var generalMapped = _mapper.Map<List<ProductResponse>>(generalResults);
-
-            var reviewSummary = _memoryCache.Get($"reviews_{mapped.Id}");
-            if (reviewSummary == null)
+            List<ChatMessage> messages = null;
+            var chatHistory = _memoryCache.Get("rag_" + productId.ToString());
+            if(chatHistory != null)
             {
-                reviewSummary = await GetProductReviewsSummary(mapped);
+                messages = (List<ChatMessage>)chatHistory;
+                messages.Add(new ChatMessage(ChatRole.User, query));
             }
-            mapped.ReviewSummary = (string)reviewSummary;
-
-            string systemPrompt = $"""
-                You are a chat assistant for an e-commerce app.
-                This is the product the user is inquiring about:
-                {JsonConvert.SerializeObject(mapped)}
-
-                If the question seems specific, then answer relating only to the product.
-
-                If the question is more generalized, then you can combine information from the other products listed here:
-                {JsonConvert.SerializeObject(generalMapped)}
-
-                Answer like an actual assistant trying to provide meaningful information.
-
-                Answer only questions related to the context of our e-commerce app.
-                If the question is not related prompt the user to
-                ask another question.
-                """;
-            var messages = new List<ChatMessage>
+            else
             {
-                new ChatMessage(ChatRole.System, systemPrompt),
-                new ChatMessage(ChatRole.User, query)
-            };
+                var mapped = _mapper.Map<ProductResponse>(product);
 
-            var chat = _aIService.GetChatCompletion(messages);
+                var queryEmbedding = await _aIService.GetEmbedding(query);
+            
+                var generalResults = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding);
+                var generalMapped = _mapper.Map<List<ProductResponse>>(generalResults);
+
+                var reviewSummary = _memoryCache.Get($"reviews_{mapped.Id}");
+                if (reviewSummary == null)
+                {
+                    reviewSummary = await GetProductReviewsSummary(mapped);
+                }
+                mapped.ReviewSummary = (string)reviewSummary;
+
+                string systemPrompt = $"""
+                    You are a chat assistant for an e-commerce app.
+                    This is the product the user is inquiring about:
+                    {JsonConvert.SerializeObject(mapped)}
+
+                    If the question seems specific, then answer relating only to the product.
+
+                    If the question is more generalized, then you can make use of the Search tool to get more context.
+
+                    Answer like an actual assistant trying to provide meaningful information.
+
+                    Answer only questions related to the context of our e-commerce app.
+                    If the question is not related prompt the user to
+                    ask another question.
+                    """;
+                messages = new List<ChatMessage>
+                {
+                    new ChatMessage(ChatRole.System, systemPrompt),
+                    new ChatMessage(ChatRole.User, query)
+                };
+            }
+
+
+            var chat = _aIService.GetChatCompletion(messages, _chatOptions);
+            StringBuilder sb = new ();
+
             await foreach(string chunk in chat)
             {
+                sb.Append(chunk);
                 yield return chunk;
             }
+
+            messages.Add(new ChatMessage(ChatRole.Assistant, sb.ToString()));
+            _memoryCache.Set("rag_" + productId.ToString(), messages);
         }
 
         public async Task EmbedPendingItems()
@@ -146,7 +168,7 @@ namespace DemoEcommerce.Application.Implementations
             };
             var summary = new StringBuilder();
 
-            var response = _aIService.GetChatCompletion(messages);
+            var response = _aIService.GetChatCompletion(messages, _chatOptions);
             await foreach (var chunk in response)
             {
                 summary.Append(chunk);
@@ -154,6 +176,42 @@ namespace DemoEcommerce.Application.Implementations
 
             _memoryCache.Set($"reviews_{productResponse.Id}", summary.ToString());
             return summary.ToString();
+        }
+
+        [Description("Searches the vector to get more context")]
+        public async Task<List<Product>> Search(
+            [Description("This is the last message sent by the user.")] string userMessage, 
+            //[Description("The names of OTHER products to filter by. If not specified we may search in all products. If it does not apply then leave null.")] string? productName,
+            [Description("The category id to filter by. Use this to search for similar products. If not specified we may search in all categories.")] string? categoryId)
+        {
+            try
+            {
+                Console.WriteLine("searching...");
+                var queryEmbedding = await _aIService.GetEmbedding(userMessage);
+                //if(productName != null)
+                //{
+                //    var products = _dbContext.Products.Where(p => p.Name.Contains(productName, StringComparison.OrdinalIgnoreCase));
+                //    if (!products.Any()) productName = null;
+                //}
+                if(!string.IsNullOrEmpty(categoryId))
+                {
+                    var category = _dbContext.Categories.Find(Guid.Parse(categoryId));
+                    if (category == null) categoryId = null;
+                }
+
+                var response = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding, filter: p =>
+                    //((productName != null && p.Name.Contains(productName, StringComparison.OrdinalIgnoreCase)) || productName == null)
+                    //&&
+                    ((categoryId != null && p.CategoryId == Guid.Parse(categoryId)) || categoryId == null)
+                );
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
     }
 }

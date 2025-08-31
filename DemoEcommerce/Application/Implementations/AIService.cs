@@ -17,9 +17,10 @@ namespace DemoEcommerce.Application.Implementations
             _embeddingClient = client
                 .GetEmbeddingClient(config["OpenAI:EmbeddingModel"])
                 .AsIEmbeddingGenerator();
-            _chatClient = client
-                .GetChatClient(config["OpenAI:ChatModel"])
-                .AsIChatClient();
+            _chatClient =
+                new ChatClientBuilder(client.GetChatClient(config["OpenAI:ChatModel"]).AsIChatClient())
+                .UseFunctionInvocation()
+                .Build();
         }
 
         public async Task<ReadOnlyMemory<float>> GetEmbedding(string data)
@@ -52,9 +53,9 @@ namespace DemoEcommerce.Application.Implementations
             }
         }
 
-        public async IAsyncEnumerable<string> GetChatCompletion(List<ChatMessage> chatMessages)
+        public async IAsyncEnumerable<string> GetChatCompletion(List<ChatMessage> chatMessages, ChatOptions options)
         {
-            var response = _chatClient.GetStreamingResponseAsync(chatMessages);
+            var response = _chatClient.GetStreamingResponseAsync(chatMessages, options);
 
             await foreach (var chunk in response)
             {

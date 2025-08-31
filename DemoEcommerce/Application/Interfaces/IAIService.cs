@@ -6,6 +6,6 @@ namespace DemoEcommerce.Application.Interfaces
     {
         Task<ReadOnlyMemory<float>> GetEmbedding(string data);
         IAsyncEnumerable<string> GetChatCompletion(string query, string data);
-        IAsyncEnumerable<string> GetChatCompletion(List<ChatMessage> chatMessages);
+        IAsyncEnumerable<string> GetChatCompletion(List<ChatMessage> chatMessages, ChatOptions options);
     }
 }
