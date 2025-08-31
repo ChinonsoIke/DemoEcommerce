@@ -56,21 +56,22 @@ namespace DemoEcommerce.Application.Implementations
 
         public async IAsyncEnumerable<string> SingleProductRAGQuery(Guid productId, string query)
         {
+            Product product = _dbContext.Products.Include(p => p.Reviews).FirstOrDefault(p => p.Id == productId);
+            if (product == null) yield break;
+
+            var mapped = _mapper.Map<ProductResponse>(product);
+
             var queryEmbedding = await _aIService.GetEmbedding(query);
-            var results = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding, filter: p => p.Id == productId);
+            
             var generalResults = await _inMemoryVectorStores.Service<Product>().Search(queryEmbedding);
-            var mapped = _mapper.Map<List<ProductResponse>>(results);
             var generalMapped = _mapper.Map<List<ProductResponse>>(generalResults);
 
-            foreach ( var result in mapped)
+            var reviewSummary = _memoryCache.Get($"reviews_{mapped.Id}");
+            if (reviewSummary == null)
             {
-                var reviewSummary = _memoryCache.Get($"reviews_{result.Id}");
-                if (reviewSummary == null)
-                {
-                    reviewSummary = await GetProductReviewsSummary(result);
-                }
-                result.ReviewSummary = (string)reviewSummary;
+                reviewSummary = await GetProductReviewsSummary(mapped);
             }
+            mapped.ReviewSummary = (string)reviewSummary;
 
             string systemPrompt = $"""
                 You are a chat assistant for an e-commerce app.
