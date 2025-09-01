@@ -97,7 +97,7 @@ namespace DemoEcommerce.Application.Implementations
 
                     If the question is more generalized, then you can make use of the Search tool to get more context.
 
-                    Answer like an actual assistant trying to provide meaningful information.
+                    Answer like an actual assistant trying to provide meaningful information. Keep your answers concise.
 
                     Answer only questions related to the context of our e-commerce app.
                     If the question is not related prompt the user to
